@@ -12,7 +12,7 @@ int board[9];	//vector to represent the board
 				//The contents of the board - 2 if empty place, 3 if X has played a position, 5 if O has played
 
 int turn;	//can take values from 1-9
-bool round_finish_flag = false;
+int round_finish_flag = 0;
 
 int mul(int a, int b, int c);
 int posswin(int p)
@@ -197,54 +197,6 @@ void incturn()
 	turn++;
 }
 
-
-
-void refresh_board()
-{
-	//Show the board. If you want to clear the screen before this, please do so..
-	cout << endl;
-
-	if (turn % 2 == 0)
-		cout << "Computer's move: " << endl;
-	if (turn % 2 != 0)
-		cout << "Player's move: " << endl;
-
-	for (int i = 0; i < 3; i++)
-	{
-		//cout<<" "<<i*3+1<<" ";
-		if (board[3 * i + 0] == 3)
-			//cout<<"X";
-			cout << " " << "X" << " ";
-		else if (board[3 * i + 0] == 5)
-			//cout<<"O";
-			cout << " " << "0" << " ";
-		else cout << " " << i * 3 + 1 << " ";
-
-		//cout<<" | "<<i*3+2<<" ";
-		if (board[3 * i + 1] == 3)
-			//cout<<"X";
-			cout << " | X ";
-		else if (board[3 * i + 1] == 5)
-			//cout<<"O";
-			cout << " | O ";
-		else cout << " | " << i * 3 + 2 << " ";
-
-		//cout<<" | "<<i*3+3<<" ";
-		if (board[3 * i + 2] == 3)
-			cout << " | X ";
-		else if (board[3 * i + 2] == 5)
-			cout << " | O ";
-		else cout << " | " << i * 3 + 3 << " ";
-
-		cout << "   " << endl;
-		if (i < 2) {
-			cout << "---------------" << endl;
-		}
-	}
-
-	cout << endl;
-}
-
 char* make_board_value()
 {
 	char res[256] = { 0 };
@@ -272,7 +224,7 @@ char* check_result(int client_no, int turn_no)
 		if (checkwin(3) == 3)
 		{
 			sprintf(res, "%s|%d|%s", make_board_value(), turn, "Client Win!");
-			round_finish_flag = true;
+			round_finish_flag = 1;
 			return strdup(res);
 		}
 		incturn();
@@ -285,7 +237,7 @@ char* check_result(int client_no, int turn_no)
 		if (checkwin(5) == 5)
 		{
 			sprintf(res, "%s|%d|%s", make_board_value(), turn, "Server Win!");
-			round_finish_flag = true;
+			round_finish_flag = 1;
 			return strdup(res);
 		}
 		incturn();
@@ -298,7 +250,7 @@ char* check_result(int client_no, int turn_no)
 		if (checkwin(3) == 3)
 		{
 			sprintf(res, "%s|%d|%s", make_board_value(), turn, "Client Win!");
-			round_finish_flag = true;
+			round_finish_flag = 1;
 			return strdup(res);
 		}
 
@@ -313,7 +265,7 @@ char* check_result(int client_no, int turn_no)
 		if (checkwin(5) == 5)
 		{
 			sprintf(res, "%s|%d|%s", make_board_value(), turn, "Server Win!");
-			round_finish_flag = true;
+			round_finish_flag = 1;
 			return strdup(res);
 		}
 
@@ -328,7 +280,7 @@ char* check_result(int client_no, int turn_no)
 		if (checkwin(3) == 3)
 		{
 			sprintf(res, "%s|%d|%s", make_board_value(), turn, "Client Win!");
-			round_finish_flag = true;
+			round_finish_flag = 1;
 			return strdup(res);
 		}
 		incturn();//6
@@ -347,7 +299,7 @@ char* check_result(int client_no, int turn_no)
 		if (checkwin(5) == 5)
 		{
 			sprintf(res, "%s|%d|%s", make_board_value(), turn, "Server Win!");
-			round_finish_flag = true;
+			round_finish_flag = 1;
 			return strdup(res);
 		}
 
@@ -362,7 +314,7 @@ char* check_result(int client_no, int turn_no)
 		if (checkwin(3) == 3)
 		{
 			sprintf(res, "%s|%d|%s", make_board_value(), turn, "Client Win!");
-			round_finish_flag = true;
+			round_finish_flag = 1;
 			return strdup(res);
 		}
 
@@ -381,7 +333,7 @@ char* check_result(int client_no, int turn_no)
 		if (checkwin(5) == 5)
 		{
 			sprintf(res, "%s|%d|%s", make_board_value(), turn, "Server Win!");
-			round_finish_flag = true;
+			round_finish_flag = 1;
 			return strdup(res);
 		}
 
@@ -396,12 +348,12 @@ char* check_result(int client_no, int turn_no)
 		if (checkwin(3) == 3)
 		{
 			sprintf(res, "%s|%d|%s", make_board_value(), turn, "Client Win!");
-			round_finish_flag = true;
+			round_finish_flag = 1;
 			return strdup(res);
 		}
 
 		sprintf(res, "%s|%d|%s", make_board_value(), turn, "Game in draw!");
-		round_finish_flag = true;
+		round_finish_flag = 1;
 		return strdup(res);
 
 		break;
@@ -414,7 +366,7 @@ void initialize_for_newgame()
 	for (int i = 0; i < 9; i++) {
 		board[i] = 2;
 	}
-	round_finish_flag = false;
+	round_finish_flag = 0;
 }
 
 int main(void){
