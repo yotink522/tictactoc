@@ -55,7 +55,7 @@ int parse_packet(char* str)
 		printf("Cannot parse the received packet\n");
 		return 0;
 	}
-	strdup(strResult, p);
+	strResult = strdup(p);
 	free(p);
 	return 1;
 }
@@ -100,13 +100,14 @@ int main(int argc, char **argv) {
 	
 	int iResult;
 	int recvbuflen = 512;
-	int inNo = 0;
+	char inNo[MAXLINE];
 	char sendStr[MAXLINE];
 	char buf[MAXLINE];
 	
 	board_init();
 	turn = 1;
 	print_board();
+	
 	while (1){
 		if((server_sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 			perror("error : ");
@@ -124,13 +125,12 @@ int main(int argc, char **argv) {
 		}
 		
 		printf("Enter position to bet:");
-		scanf("%d",inNo);
+		memset(inNo, 0x00, MAXLINE);
+		read(0, inNo, MAXLINE);
+		
 		memset(sendStr, 0x00, MAXLINE);
-		sprintf(sendStr, "%d,%d\0", inNo, turn);
-		
-		//memset(buf, 0x00, MAXLINE);
-		//read(0, buf, MAXLINE);
-		
+		sprintf(sendStr, "%d,%d", atoi(inNo), turn);
+						
 		if(write(server_sockfd, sendStr, MAXLINE) <= 0) {
 			perror("write error : ");
 			return 1;
