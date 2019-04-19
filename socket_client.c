@@ -8,7 +8,7 @@
 
 int board[9];
 int turn;	//can take values from 1-9
-char strResult[256];
+char *strResult;
 char strBoard[256];
 
 void board_init()
@@ -97,8 +97,16 @@ int main(int argc, char **argv) {
 	struct sockaddr_in serveraddr;
 	int server_sockfd;
 	int client_len;
+	
+	int iResult;
+	int recvbuflen = 512;
+	int inNo = 0;
+	char sendStr[MAXLINE];
 	char buf[MAXLINE];
 	
+	board_init();
+	turn = 1;
+	print_board();
 	while (1){
 		if((server_sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 			perror("error : ");
@@ -114,18 +122,37 @@ int main(int argc, char **argv) {
 			perror("connect error : ");
 			return 1;
 		}
-		memset(buf, 0x00, MAXLINE);
 		
-		read(0, buf, MAXLINE);
+		printf("Enter position to bet:");
+		scanf("%d",inNo);
+		memset(sendStr, 0x00, MAXLINE);
+		sprintf(sendStr, "%d,%d\0", inNo, turn);
 		
-		if(write(server_sockfd, buf, MAXLINE) <= 0) {
+		//memset(buf, 0x00, MAXLINE);
+		//read(0, buf, MAXLINE);
+		
+		if(write(server_sockfd, sendStr, MAXLINE) <= 0) {
 			perror("write error : ");
 			return 1;
 		}
+		
 		memset(buf, 0x00, MAXLINE);
 		if(read(server_sockfd, buf, MAXLINE) <= 0) {
 			perror("read error: ");
 			return 1;
+		}
+		
+		if (parse_packet(buf) == 0) {
+			printf("Parse error\n");
+			return 1;
+		}
+
+		update_board(strBoard);
+		print_board();
+
+		if (strcmp(strResult, "continue") != 0) {
+			printf("%s\n", strResult);
+			break;
 		}
 		
 		close(server_sockfd);
