@@ -60,6 +60,7 @@ int parse_packet(char* str)
 
 void print_board()
 {
+	printf("O : Computer  X : You\n");
 	int i = 0;
 	for (i = 0; i < 3; i++)
 	{
@@ -81,7 +82,7 @@ void print_board()
 		else if (board[3 * i + 2] == 5)
 			printf(" | %s ","O");
 		else 
-			printf(" | %d ",i*3+2);
+			printf(" | %d ",i*3+3);
 
 		printf("   \n");
 		if (i < 2) {
