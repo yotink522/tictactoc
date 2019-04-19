@@ -438,9 +438,6 @@ int main(void){
 				close(client_socket);
 				break;
 			}
-
-			sprintf(buff_snd, "%ld : %s", strlen(buff_rcv), buff_rcv);
-			write(client_socket, buff_snd, strlen(buff_snd)+1);          // +1: transfer include NULL
 			close(client_socket);
 		}
 	}
