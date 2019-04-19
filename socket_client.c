@@ -1,63 +1,43 @@
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <netdb.h>
 #include <stdio.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #include <string.h>
-#include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
-#include <arpa/inet.h> 
+#include <stdlib.h>
+#define MAXLINE 1024
+ 
+int main(int argc, char **argv) {
+	struct sockaddr_in serveraddr;
+	int server_sockfd;
+	int client_len;
+	char buf[MAXLINE];
 
-int main(int argc, char *argv[])
-{
-    int sockfd = 0, n = 0;
-    char recvBuff[1024];
-    struct sockaddr_in serv_addr; 
+	if((server_sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+			perror("error : ");
+			return 1;
+	}
+	serveraddr.sin_family = AF_INET;
+	serveraddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	serveraddr.sin_port = htons(4000);
 
-    if(argc != 2)
-    {
-        printf("\n Usage: %s <ip of server> \n",argv[0]);
-        return 1;
-    } 
+	client_len = sizeof(serveraddr);
 
-    memset(recvBuff, '0',sizeof(recvBuff));
-    if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        printf("\n Error : Could not create socket \n");
-        return 1;
-    } 
-
-    memset(&serv_addr, '0', sizeof(serv_addr)); 
-
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(5000); 
-
-    if(inet_pton(AF_INET, argv[1], &serv_addr.sin_addr)<=0)
-    {
-        printf("\n inet_pton error occured\n");
-        return 1;
-    } 
-
-    if( connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-    {
-       printf("\n Error : Connect Failed \n");
-       return 1;
-    } 
-
-    while ( (n = read(sockfd, recvBuff, sizeof(recvBuff)-1)) > 0)
-    {
-        recvBuff[n] = 0;
-        if(fputs(recvBuff, stdout) == EOF)
-        {
-            printf("\n Error : Fputs error\n");
-        }
-    } 
-
-    if(n < 0)
-    {
-        printf("\n Read error \n");
-    } 
-
-    return 0;
+	if(connect(server_sockfd, (struct sockaddr*)&serveraddr, client_len) == -1) {
+		perror("connect error : ");
+		return 1;
+	}
+	memset(buf, 0x00, MAXLINE);
+	read(0, buf, MAXLINE);
+	if(write(server_sockfd, buf, MAXLINE) <= 0) {
+		perror("write error : ");
+		return 1;
+	}
+	memset(buf, 0x00, MAXLINE);
+	if(read(server_sockfd, buf, MAXLINE) <= 0) {
+		perror("read error: ");
+		return 1;
+	}
+	close(server_sockfd);
+	printf("server:%s\n", buf);
+	return 0;
 }
