@@ -130,6 +130,7 @@ int main(int argc, char **argv) {
 		printf("Enter position to bet:");
 		memset(inNo, 0x00, MAXLINE);
 		read(0, inNo, MAXLINE);
+		prinf("\n");
 		
 		memset(sendStr, 0x00, MAXLINE);
 		sprintf(sendStr, "%d,%d", atoi(inNo), turn);
