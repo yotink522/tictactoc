@@ -380,7 +380,7 @@ int main(void){
 	char buff_rcv[BUFF_SIZE+5];
 	char buff_snd[BUFF_SIZE+5];
 
-	while (1) {
+	//while (1) {
 		server_socket = socket(PF_INET, SOCK_STREAM, 0);
 		if(-1 == server_socket){
 		  printf( "Failed to create server socket\n");
@@ -434,11 +434,11 @@ int main(void){
 			write(client_socket, resp, strlen(resp)+1);
 			
 			if (round_finish_flag == 1) {
-				printf("Round has been finished.\n");
+				printf("Round has been finished. Server will be shutting down... Bye.\n");
 				close(client_socket);
 				break;
 			}
 			close(client_socket);
 		}
-	}
+	//}
 }
