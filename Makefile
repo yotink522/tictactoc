@@ -1,10 +1,9 @@
-CC=gcc
-CFLAGS=-g -Wall
-OBJS=server.o client.o
-TARGET=app.out
- 
-$(TARGET): $(OBJS)
-    $(CC) -o $@ $(OBJS)
- 
-server.o: tic_server.c
-client.o: tic_client.c
+all: server client
+CC = gcc
+
+server: tic_server.c
+		$(CC) -o $@ $<
+client: tic_client.c
+		$(CC) -o $@ $<
+clean:
+		rm -f client server
