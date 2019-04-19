@@ -370,51 +370,78 @@ void initialize_for_newgame()
 }
 
 int main(void){
-   int server_socket;
-   int client_socket;
-   int client_addr_size;
- 
-   struct sockaddr_in server_addr;
-   struct sockaddr_in client_addr;
- 
-   char buff_rcv[BUFF_SIZE+5];
-   char buff_snd[BUFF_SIZE+5];
- 
-   server_socket = socket(PF_INET, SOCK_STREAM, 0);
-   if(-1 == server_socket){
-      printf( "Failed to create server socket\n");
-      exit( 1);
-   }
- 
-   memset(&server_addr, 0, sizeof(server_addr));
-   server_addr.sin_family     = AF_INET;
-   server_addr.sin_port       = htons(4000);
-   server_addr.sin_addr.s_addr= htonl(INADDR_ANY);
- 
-   if(-1 == bind(server_socket, (struct sockaddr*)&server_addr, sizeof(server_addr))){
-      printf( "Error on bind()\n");
-      exit(1);
-   }
- 
-   while(1){
-      if(-1 == listen(server_socket, 5)){
-         printf( "Failed to set on standby mode\n");
-         exit(1);
-      }
- 
-      client_addr_size  = sizeof( client_addr);
-      client_socket = accept( server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
- 
-      if (-1 == client_socket){
-         printf( "Failed to receive from client\n");
-         exit(1);
-      }
- 
-      read (client_socket, buff_rcv, BUFF_SIZE);
-      printf("receive: %s\n", buff_rcv);
- 
-      sprintf(buff_snd, "%ld : %s", strlen(buff_rcv), buff_rcv);
-      write(client_socket, buff_snd, strlen(buff_snd)+1);          // +1: transfer include NULL
-      close(client_socket);
-   }
+	int server_socket;
+	int client_socket;
+	int client_addr_size;
+
+	struct sockaddr_in server_addr;
+	struct sockaddr_in client_addr;
+
+	char buff_rcv[BUFF_SIZE+5];
+	char buff_snd[BUFF_SIZE+5];
+
+	while (1) {
+		server_socket = socket(PF_INET, SOCK_STREAM, 0);
+		if(-1 == server_socket){
+		  printf( "Failed to create server socket\n");
+		  exit( 1);
+		}
+
+		memset(&server_addr, 0, sizeof(server_addr));
+		server_addr.sin_family     = AF_INET;
+		server_addr.sin_port       = htons(4000);
+		server_addr.sin_addr.s_addr= htonl(INADDR_ANY);
+
+		if(-1 == bind(server_socket, (struct sockaddr*)&server_addr, sizeof(server_addr))){
+		  printf( "Error on bind()\n");
+		  exit(1);
+		}
+		
+		printf("Server is started, portno=4000\nWaiting for new Connections....\n");
+		initialize_for_newgame();
+			
+		while(1){
+			if(-1 == listen(server_socket, 5)){
+			 printf( "Failed to set on standby mode\n");
+			 exit(1);
+			}
+
+			client_addr_size  = sizeof( client_addr);
+			client_socket = accept( server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
+
+			if (-1 == client_socket){
+			 printf( "Failed to receive from client\n");
+			 exit(1);
+			}
+
+			read (client_socket, buff_rcv, BUFF_SIZE);
+			
+			char* p = strtok(recvbuf, ",");
+			if (p == NULL) {
+				printf("Cannot parse the received packet\n");
+				return 0;
+			}
+			int client_no = atoi(p);
+
+			p = strtok(NULL, ",");
+			if (p == NULL) {
+				printf("Cannot parse the received packet\n");
+				return 0;
+			}
+			turn = atoi(p);
+
+			char* resp = check_result(client_no, turn);
+			write(client_socket, resp, strlen(resp)+1);
+			
+			if (round_finish_flag == 1) {
+				printf("Round has been finished.\n");
+				close(client_socket);
+				break;
+			}
+
+			sprintf(buff_snd, "%ld : %s", strlen(buff_rcv), buff_rcv);
+			write(client_socket, buff_snd, strlen(buff_snd)+1);          // +1: transfer include NULL
+			close(client_socket);
+		}
+	}
 }
